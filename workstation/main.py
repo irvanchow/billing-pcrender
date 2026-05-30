@@ -22,6 +22,7 @@ class KioskController:
         for screen in qt_app.screens():
             ls = LockScreen(screen_geometry=screen.geometry())
             ls.unlocked.connect(self._on_unlocked)
+            ls.it_exit_requested.connect(self._on_it_exit)
             self._lock_screens.append(ls)
 
         self._timer_overlay = TimerOverlay()
@@ -96,6 +97,13 @@ class KioskController:
         QMetaObject.invokeMethod(
             self._app, "on_force_lock", Qt.ConnectionType.QueuedConnection
         )
+
+    def _on_it_exit(self):
+        """Handle IT exit request - remove kiosk lock and quit app"""
+        from workstation.app.core import kiosk_lock
+        kiosk_lock.remove()
+        self._polling.stop()
+        self._app.quit()
 
 
 class KioskApp(QApplication):

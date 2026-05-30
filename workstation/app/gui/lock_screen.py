@@ -3,7 +3,7 @@ import sys
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QFont, QPixmap
-from PyQt6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QInputDialog, QLabel, QMessageBox, QVBoxLayout, QWidget
 
 from workstation.app.api_client import unlock_with_pin
 from workstation.app.core import kiosk_lock
@@ -21,6 +21,7 @@ def _logo_path() -> str:
 
 class LockScreen(QWidget):
     unlocked = pyqtSignal(int, str, str)  # session_id, student_name, expires_at
+    it_exit_requested = pyqtSignal()  # Signal untuk IT exit
 
     def __init__(self, screen_geometry=None, parent=None):
         super().__init__(parent)
@@ -111,3 +112,34 @@ class LockScreen(QWidget):
 
     def closeEvent(self, event):
         event.ignore()
+
+    def keyPressEvent(self, event):
+        # IT Escape: Ctrl+Shift+F12
+        if (event.key() == Qt.Key.Key_F12 and
+            event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)):
+            self._handle_it_escape()
+        else:
+            super().keyPressEvent(event)
+
+    def _handle_it_escape(self):
+        password, ok = QInputDialog.getText(
+            self, "IT Access",
+            "Masukkan password IT untuk keluar dari kiosk mode:",
+            QInputDialog.InputMode.EchoMode.Password
+        )
+        if not ok:
+            return
+
+        # Password IT (ganti sesuai kebutuhan)
+        IT_PASSWORD = "admin123"
+
+        if password == IT_PASSWORD:
+            reply = QMessageBox.question(
+                self, "Konfirmasi IT Exit",
+                "Keluar dari kiosk mode?\n\nAplikasi akan tertutup dan desktop akan terlihat.",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                self.it_exit_requested.emit()
+        else:
+            QMessageBox.warning(self, "Akses Ditolak", "Password IT salah!")
