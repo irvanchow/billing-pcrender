@@ -122,6 +122,11 @@ class KioskApp(QApplication):
         return super().eventFilter(obj, event)
 
     def _handle_it_escape(self):
+        # Temporarily hide all lock screens to show dialog
+        for ls in self._controller._lock_screens:
+            ls._focus_guard.stop()
+            ls.hide()
+
         # Create a temporary widget to be parent of dialogs, with topmost flag
         temp_parent = QWidget()
         temp_parent.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool)
@@ -135,6 +140,10 @@ class KioskApp(QApplication):
         )
 
         if not ok:
+            # Restore lock screens if cancelled
+            for ls in self._controller._lock_screens:
+                ls.show()
+                ls._focus_guard.start(500)
             temp_parent.deleteLater()
             return
 
@@ -154,8 +163,17 @@ class KioskApp(QApplication):
                 temp_parent.deleteLater()
                 self.quit()
                 return
+            else:
+                # Restore lock screens if cancelled
+                for ls in self._controller._lock_screens:
+                    ls.show()
+                    ls._focus_guard.start(500)
         else:
             QMessageBox.warning(temp_parent, "Akses Ditolak", "Password IT salah!")
+            # Restore lock screens
+            for ls in self._controller._lock_screens:
+                ls.show()
+                ls._focus_guard.start(500)
 
         temp_parent.deleteLater()
 
