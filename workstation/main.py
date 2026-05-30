@@ -1,7 +1,7 @@
 import sys
 
-from PyQt6.QtCore import QMetaObject, Qt, pyqtSlot
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtCore import QEvent, QMetaObject, Qt, pyqtSlot
+from PyQt6.QtWidgets import QApplication, QInputDialog, QMessageBox
 
 from workstation.app.api_client import PollingThread, report_expired
 from workstation.app.core.session_state import SessionState, State
@@ -22,7 +22,6 @@ class KioskController:
         for screen in qt_app.screens():
             ls = LockScreen(screen_geometry=screen.geometry())
             ls.unlocked.connect(self._on_unlocked)
-            ls.it_exit_requested.connect(self._on_it_exit)
             self._lock_screens.append(ls)
 
         self._timer_overlay = TimerOverlay()
@@ -98,13 +97,6 @@ class KioskController:
             self._app, "on_force_lock", Qt.ConnectionType.QueuedConnection
         )
 
-    def _on_it_exit(self):
-        """Handle IT exit request - remove kiosk lock and quit app"""
-        from workstation.app.core import kiosk_lock
-        kiosk_lock.remove()
-        self._polling.stop()
-        self._app.quit()
-
 
 class KioskApp(QApplication):
     def __init__(self, argv):
@@ -112,6 +104,43 @@ class KioskApp(QApplication):
         self.setApplicationName("IDB Kiosk Timer")
         self.setQuitOnLastWindowClosed(False)
         self._controller = KioskController(self)
+        # Install global event filter for IT escape key
+        self.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        # Intercept Ctrl+Shift+F12 globally
+        if event.type() == QEvent.Type.KeyPress:
+            if (event.key() == Qt.Key.Key_F12 and
+                event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)):
+                self._handle_it_escape()
+                return True
+        return super().eventFilter(obj, event)
+
+    def _handle_it_escape(self):
+        password, ok = QInputDialog.getText(
+            None, "IT Access",
+            "Masukkan password IT untuk keluar dari kiosk mode:",
+            QInputDialog.InputMode.EchoMode.Password
+        )
+        if not ok:
+            return
+
+        # Password IT (ganti sesuai kebutuhan)
+        IT_PASSWORD = "admin123"
+
+        if password == IT_PASSWORD:
+            reply = QMessageBox.question(
+                None, "Konfirmasi IT Exit",
+                "Keluar dari kiosk mode?\n\nAplikasi akan tertutup dan desktop akan terlihat.",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                from workstation.app.core import kiosk_lock
+                kiosk_lock.remove()
+                self._controller._polling.stop()
+                self.quit()
+        else:
+            QMessageBox.warning(None, "Akses Ditolak", "Password IT salah!")
 
     def start(self):
         self._controller.start()
