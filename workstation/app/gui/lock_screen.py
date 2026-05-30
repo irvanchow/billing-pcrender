@@ -86,9 +86,10 @@ class LockScreen(QWidget):
             self.raise_()
 
     def _on_pin_submitted(self, pin: str):
-        result = unlock_with_pin(pin)
-        if result is None:
-            self._pin_entry.show_error("PIN tidak valid atau sudah expired")
+        try:
+            result = unlock_with_pin(pin)
+        except RuntimeError as e:
+            self._pin_entry.show_error(str(e))
             return
         self._pin_entry.clear()
         self.unlocked.emit(

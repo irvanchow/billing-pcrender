@@ -59,9 +59,16 @@ def unlock_with_pin(pin: str) -> Optional[dict]:
         )
         if r.status_code == 200:
             return r.json()
-        return None
-    except Exception:
-        return None
+        # Surface the server's error detail so the caller can show a meaningful message
+        try:
+            detail = r.json().get("detail", "")
+        except Exception:
+            detail = ""
+        raise RuntimeError(detail or f"HTTP {r.status_code}")
+    except requests.exceptions.ConnectionError:
+        raise RuntimeError(f"Tidak dapat terhubung ke server ({SERVER_URL})")
+    except requests.exceptions.Timeout:
+        raise RuntimeError("Koneksi ke server timeout")
 
 
 def report_expired(session_id: int) -> None:

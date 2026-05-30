@@ -6,7 +6,7 @@ import sys
 def _get_config_path() -> str:
     if getattr(sys, "frozen", False):
         return os.path.join(os.path.dirname(sys.executable), "config.ini")
-    return os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.ini")
+    return os.path.join(os.path.dirname(__file__), "..", "..", "config.ini")
 
 
 def _load() -> dict:
