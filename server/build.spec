@@ -59,6 +59,7 @@ exe = EXE(
     upx=True,
     console=False,
     disable_windowed_traceback=False,
+    uac_admin=True,
     icon=_icon,
 )
 
