@@ -3,14 +3,17 @@ import os
 
 block_cipher = None
 
+_datas = [('../shared', 'shared')]
+if os.path.isdir('assets') and any(f for f in os.listdir('assets') if not f.startswith('.')):
+    _datas.append(('assets', 'assets'))
+
+_icon = 'assets/icon.ico' if os.path.isfile('assets/icon.ico') else None
+
 a = Analysis(
     ['main.py'],
     pathex=[os.path.abspath('..'), os.path.abspath('.')],
     binaries=[],
-    datas=[
-        ('assets', 'assets'),
-        ('../shared', 'shared'),
-    ],
+    datas=_datas,
     hiddenimports=[
         'win32api',
         'win32con',
@@ -49,5 +52,5 @@ exe = EXE(
     console=False,
     disable_windowed_traceback=False,
     uac_admin=True,
-    icon='assets/icon.ico',
+    icon=_icon,
 )

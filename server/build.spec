@@ -3,15 +3,17 @@ import os
 
 block_cipher = None
 
+_datas = [('../shared', 'shared')]
+if os.path.isdir('assets') and any(f for f in os.listdir('assets') if not f.startswith('.')):
+    _datas.append(('assets', 'assets'))
+if os.path.isdir('data') and any(f for f in os.listdir('data') if not f.startswith('.')):
+    _datas.append(('data', 'data'))
+
 a = Analysis(
     ['main.py'],
     pathex=[os.path.abspath('..'), os.path.abspath('.')],
     binaries=[],
-    datas=[
-        ('assets', 'assets'),
-        ('data', 'data'),
-        ('../shared', 'shared'),
-    ],
+    datas=_datas,
     hiddenimports=[
         'uvicorn.logging',
         'uvicorn.loops',
@@ -43,6 +45,8 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+_icon = 'assets/icon.ico' if os.path.isfile('assets/icon.ico') else None
+
 exe = EXE(
     pyz,
     a.scripts,
@@ -55,7 +59,7 @@ exe = EXE(
     upx=True,
     console=False,
     disable_windowed_traceback=False,
-    icon='assets/icon.ico',
+    icon=_icon,
 )
 
 coll = COLLECT(
