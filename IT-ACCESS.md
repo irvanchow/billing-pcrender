@@ -4,7 +4,7 @@
 
 Saat workstation dalam lock screen (kiosk mode), IT staff dapat keluar ke desktop dengan cara:
 
-1. Tekan kombinasi keyboard: **Ctrl + Shift + F12**
+1. Tekan kombinasi keyboard: **Ctrl + Shift + Escape**
 2. Aplikasi akan langsung tertutup dan desktop akan terlihat
 
 **PERINGATAN:** Kombinasi ini tidak memerlukan password, jadi jangan beritahu ke user biasa.
@@ -15,12 +15,12 @@ Edit file: `workstation/main.py`
 
 Cari baris:
 ```python
-if key == Qt.Key.Key_F12 and (mods & ctrl_shift) == ctrl_shift:
+if key == Qt.Key.Key_Escape and (mods & ctrl_shift) == ctrl_shift:
 ```
 
-Ganti `Qt.Key.Key_F12` dengan key lain, misalnya:
+Ganti `Qt.Key.Key_Escape` dengan key lain, misalnya:
+- `Qt.Key.Key_F12` untuk F12
 - `Qt.Key.Key_F11` untuk F11
-- `Qt.Key.Key_Escape` untuk Escape
 - dll
 
 ## Menjalankan Kembali Kiosk Mode

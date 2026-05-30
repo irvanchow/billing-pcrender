@@ -108,7 +108,7 @@ class KioskApp(QApplication):
         self.installEventFilter(self)
 
     def eventFilter(self, obj, event):
-        # Intercept Ctrl+Shift+F12 globally
+        # Intercept Ctrl+Shift+Escape globally
         if event.type() == QEvent.Type.KeyPress:
             key = event.key()
             mods = event.modifiers()
@@ -116,9 +116,9 @@ class KioskApp(QApplication):
             # Debug: print all key presses
             print(f"Key: {key}, Mods: {mods}")
 
-            # Check for Ctrl+Shift+F12 (both modifiers must be pressed)
+            # Check for Ctrl+Shift+Escape (both modifiers must be pressed)
             ctrl_shift = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
-            if key == Qt.Key.Key_F12 and (mods & ctrl_shift) == ctrl_shift:
+            if key == Qt.Key.Key_Escape and (mods & ctrl_shift) == ctrl_shift:
                 print("IT escape triggered!")
                 self._handle_it_escape()
                 return True
