@@ -1,0 +1,24 @@
+from enum import Enum
+
+
+class SessionStatus(str, Enum):
+    PENDING = "PENDING"
+    ACTIVE = "ACTIVE"
+    EXPIRED = "EXPIRED"
+    TERMINATED = "TERMINATED"
+    COMPLETED = "COMPLETED"
+
+
+class WorkstationStatus(str, Enum):
+    IDLE = "IDLE"
+    ACTIVE = "ACTIVE"
+    LOCK = "LOCK"
+
+
+PIN_LENGTH = 6
+WARNING_THRESHOLD_SECONDS = 300  # 5 minutes
+POLL_INTERVAL_SECONDS = 5
+HEARTBEAT_INTERVAL_SECONDS = 10
+SERVER_DEFAULT_PORT = 8765
+API_VERSION = "v1"
+API_PREFIX = f"/api/{API_VERSION}"

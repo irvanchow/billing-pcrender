@@ -1,0 +1,5 @@
+[server]
+HOST = 0.0.0.0
+PORT = 8765
+API_KEY = CHANGE_THIS_SECRET_KEY
+DB_NAME = rental.db

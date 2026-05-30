@@ -1,0 +1,4 @@
+pyqt6==6.7.0
+requests==2.32.3
+pywin32==306
+pyinstaller==6.7.0
