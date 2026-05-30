@@ -1,7 +1,7 @@
 import sys
 
 from PyQt6.QtCore import QEvent, QMetaObject, Qt, pyqtSlot
-from PyQt6.QtWidgets import QApplication, QInputDialog, QMessageBox, QWidget
+from PyQt6.QtWidgets import QApplication, QInputDialog, QLineEdit, QMessageBox, QWidget
 
 from workstation.app.api_client import PollingThread, report_expired
 from workstation.app.core.session_state import SessionState, State
@@ -131,7 +131,7 @@ class KioskApp(QApplication):
         password, ok = QInputDialog.getText(
             temp_parent, "IT Access",
             "Masukkan password IT untuk keluar dari kiosk mode:",
-            QInputDialog.EchoMode.Password
+            QLineEdit.EchoMode.Password
         )
 
         if not ok:
