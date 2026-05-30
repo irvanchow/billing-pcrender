@@ -83,8 +83,12 @@ class DashboardTab(QWidget):
                 if d["status"] == SessionStatus.ACTIVE.value and remaining is not None:
                     if remaining <= WARNING_THRESHOLD_SECONDS:
                         item.setBackground(QColor("#fff3cd"))
+                        item.setForeground(QColor("#856404"))
                     else:
                         item.setBackground(QColor("#d4edda"))
+                        item.setForeground(QColor("#155724"))
+                else:
+                    item.setForeground(QColor("#000000"))
                 self._table.setItem(r_idx, c_idx, item)
 
             btn_widget = QWidget()
