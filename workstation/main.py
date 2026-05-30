@@ -84,9 +84,10 @@ class KioskController:
 
         elif status == "IDLE":
             if self._state.state == State.ACTIVE:
-                remaining = self._state.remaining_seconds()
-                if remaining <= 0:
-                    self._expire()
+                self._state.lock()
+                QMetaObject.invokeMethod(
+                    self._app, "on_force_lock", Qt.ConnectionType.QueuedConnection
+                )
 
     def _expire(self):
         if self._state.state == State.ACTIVE:
