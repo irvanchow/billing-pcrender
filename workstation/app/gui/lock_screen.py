@@ -102,10 +102,12 @@ class LockScreen(QWidget):
         self._status_label.setText(f"PC-{PC_ID} — Tersedia")
         self._pin_entry.clear()
         kiosk_lock.install()
+        self._focus_guard.start(500)
         self.show()
         self._assert_topmost()
 
     def hide_locked(self):
+        self._focus_guard.stop()
         kiosk_lock.remove()
         self.hide()
 

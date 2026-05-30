@@ -110,8 +110,15 @@ class KioskApp(QApplication):
     def eventFilter(self, obj, event):
         # Intercept Ctrl+Shift+F12 globally
         if event.type() == QEvent.Type.KeyPress:
-            if (event.key() == Qt.Key.Key_F12 and
-                event.modifiers() == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)):
+            key = event.key()
+            mods = event.modifiers()
+            # Debug: print semua F-key presses
+            if Qt.Key.Key_F1 <= key <= Qt.Key.Key_F12:
+                print(f"Key pressed: F{key - Qt.Key.Key_F1 + 1}, modifiers: {mods}")
+
+            if (key == Qt.Key.Key_F12 and
+                mods == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)):
+                print("IT escape detected!")
                 self._handle_it_escape()
                 return True
         return super().eventFilter(obj, event)
