@@ -112,12 +112,10 @@ class KioskApp(QApplication):
         if event.type() == QEvent.Type.KeyPress:
             key = event.key()
             mods = event.modifiers()
-            # Debug: print semua F-key presses
-            if Qt.Key.Key_F1 <= key <= Qt.Key.Key_F12:
-                print(f"Key pressed: F{key - Qt.Key.Key_F1 + 1}, modifiers: {mods}")
 
-            if (key == Qt.Key.Key_F12 and
-                mods == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)):
+            # Check for Ctrl+Shift+F12 (both modifiers must be pressed)
+            ctrl_shift = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
+            if key == Qt.Key.Key_F12 and (mods & ctrl_shift) == ctrl_shift:
                 print("IT escape detected!")
                 self._handle_it_escape()
                 return True
@@ -127,7 +125,7 @@ class KioskApp(QApplication):
         password, ok = QInputDialog.getText(
             None, "IT Access",
             "Masukkan password IT untuk keluar dari kiosk mode:",
-            QInputDialog.InputMode.EchoMode.Password
+            QInputDialog.EchoMode.Password
         )
         if not ok:
             return
