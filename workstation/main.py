@@ -1,7 +1,7 @@
 import sys
 
 from PyQt6.QtCore import QEvent, QMetaObject, Qt, pyqtSlot
-from PyQt6.QtWidgets import QApplication, QInputDialog, QLineEdit, QMessageBox, QWidget
+from PyQt6.QtWidgets import QApplication
 
 from workstation.app.api_client import PollingThread, report_expired
 from workstation.app.core.session_state import SessionState, State
@@ -122,60 +122,11 @@ class KioskApp(QApplication):
         return super().eventFilter(obj, event)
 
     def _handle_it_escape(self):
-        # Temporarily hide all lock screens to show dialog
-        for ls in self._controller._lock_screens:
-            ls._focus_guard.stop()
-            ls.hide()
-
-        # Create a temporary widget to be parent of dialogs, with topmost flag
-        temp_parent = QWidget()
-        temp_parent.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool)
-        temp_parent.show()
-        temp_parent.hide()
-
-        password, ok = QInputDialog.getText(
-            temp_parent, "IT Access",
-            "Masukkan password IT untuk keluar dari kiosk mode:",
-            QLineEdit.EchoMode.Password
-        )
-
-        if not ok:
-            # Restore lock screens if cancelled
-            for ls in self._controller._lock_screens:
-                ls.show()
-                ls._focus_guard.start(500)
-            temp_parent.deleteLater()
-            return
-
-        # Password IT (ganti sesuai kebutuhan)
-        IT_PASSWORD = "admin123"
-
-        if password == IT_PASSWORD:
-            reply = QMessageBox.question(
-                temp_parent, "Konfirmasi IT Exit",
-                "Keluar dari kiosk mode?\n\nAplikasi akan tertutup dan desktop akan terlihat.",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-            if reply == QMessageBox.StandardButton.Yes:
-                from workstation.app.core import kiosk_lock
-                kiosk_lock.remove()
-                self._controller._polling.stop()
-                temp_parent.deleteLater()
-                self.quit()
-                return
-            else:
-                # Restore lock screens if cancelled
-                for ls in self._controller._lock_screens:
-                    ls.show()
-                    ls._focus_guard.start(500)
-        else:
-            QMessageBox.warning(temp_parent, "Akses Ditolak", "Password IT salah!")
-            # Restore lock screens
-            for ls in self._controller._lock_screens:
-                ls.show()
-                ls._focus_guard.start(500)
-
-        temp_parent.deleteLater()
+        # Langsung keluar dari kiosk mode tanpa password
+        from workstation.app.core import kiosk_lock
+        kiosk_lock.remove()
+        self._controller._polling.stop()
+        self.quit()
 
     def start(self):
         self._controller.start()
