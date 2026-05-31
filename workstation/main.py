@@ -104,7 +104,8 @@ class KioskController:
         from workstation.app.core import kiosk_lock
         kiosk_lock.remove()
         self._polling.stop()
-        self._app.quit()
+        # Force exit
+        sys.exit(0)
 
 
 class KioskApp(QApplication):
