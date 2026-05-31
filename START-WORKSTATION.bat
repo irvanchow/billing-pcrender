@@ -1,4 +1,3 @@
 @echo off
-title IDB Kiosk Workstation
 cd /d "%~dp0"
-python -m workstation.main
+start "" pythonw -m workstation.main

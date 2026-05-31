@@ -9,7 +9,7 @@ set "PROJECT_DIR=%~dp0"
 set "STARTUP_DIR=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"
 
 echo Membuat shortcut startup...
-powershell -Command "$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut('%STARTUP_DIR%\IDB-Kiosk.lnk'); $s.TargetPath = '%PROJECT_DIR%START-WORKSTATION.bat'; $s.WorkingDirectory = '%PROJECT_DIR%'; $s.Save()"
+powershell -Command "$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut('%STARTUP_DIR%\IDB-Kiosk.lnk'); $s.TargetPath = 'pythonw'; $s.Arguments = '-m workstation.main'; $s.WorkingDirectory = '%PROJECT_DIR%'; $s.WindowStyle = 7; $s.Save()"
 
 echo.
 echo ========================================
