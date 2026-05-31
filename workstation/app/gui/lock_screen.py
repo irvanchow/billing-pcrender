@@ -21,6 +21,7 @@ def _logo_path() -> str:
 
 class LockScreen(QWidget):
     unlocked = pyqtSignal(int, str, str)  # session_id, student_name, expires_at
+    it_exit_requested = pyqtSignal()  # Signal untuk IT exit
 
     def __init__(self, screen_geometry=None, parent=None):
         super().__init__(parent)
@@ -113,3 +114,17 @@ class LockScreen(QWidget):
 
     def closeEvent(self, event):
         event.ignore()
+
+    def keyPressEvent(self, event):
+        # Debug: print all keys
+        print(f"LockScreen Key: {event.key()}, Mods: {event.modifiers()}")
+
+        # Check for Ctrl+Shift+Escape
+        ctrl_shift = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
+        if event.key() == Qt.Key.Key_Escape and (event.modifiers() & ctrl_shift) == ctrl_shift:
+            print("IT escape from LockScreen!")
+            self.it_exit_requested.emit()
+            return
+
+        # Pass to parent for normal handling
+        super().keyPressEvent(event)

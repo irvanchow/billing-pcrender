@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6.QtCore import QEvent, QMetaObject, Qt, pyqtSlot
+from PyQt6.QtCore import QMetaObject, Qt, pyqtSlot
 from PyQt6.QtWidgets import QApplication
 
 from workstation.app.api_client import PollingThread, report_expired
@@ -22,6 +22,7 @@ class KioskController:
         for screen in qt_app.screens():
             ls = LockScreen(screen_geometry=screen.geometry())
             ls.unlocked.connect(self._on_unlocked)
+            ls.it_exit_requested.connect(self._on_it_exit)
             self._lock_screens.append(ls)
 
         self._timer_overlay = TimerOverlay()
@@ -97,6 +98,13 @@ class KioskController:
             self._app, "on_force_lock", Qt.ConnectionType.QueuedConnection
         )
 
+    def _on_it_exit(self):
+        """Handle IT exit request"""
+        from workstation.app.core import kiosk_lock
+        kiosk_lock.remove()
+        self._polling.stop()
+        self._app.quit()
+
 
 class KioskApp(QApplication):
     def __init__(self, argv):
@@ -104,32 +112,6 @@ class KioskApp(QApplication):
         self.setApplicationName("IDB Kiosk Timer")
         self.setQuitOnLastWindowClosed(False)
         self._controller = KioskController(self)
-        # Install global event filter for IT escape key
-        self.installEventFilter(self)
-
-    def eventFilter(self, obj, event):
-        # Intercept Ctrl+Shift+Escape globally
-        if event.type() == QEvent.Type.KeyPress:
-            key = event.key()
-            mods = event.modifiers()
-
-            # Debug: print all key presses
-            print(f"Key: {key}, Mods: {mods}")
-
-            # Check for Ctrl+Shift+Escape (both modifiers must be pressed)
-            ctrl_shift = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
-            if key == Qt.Key.Key_Escape and (mods & ctrl_shift) == ctrl_shift:
-                print("IT escape triggered!")
-                self._handle_it_escape()
-                return True
-        return super().eventFilter(obj, event)
-
-    def _handle_it_escape(self):
-        # Langsung keluar dari kiosk mode tanpa password
-        from workstation.app.core import kiosk_lock
-        kiosk_lock.remove()
-        self._controller._polling.stop()
-        self.quit()
 
     def start(self):
         self._controller.start()
