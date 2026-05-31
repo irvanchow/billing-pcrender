@@ -103,7 +103,7 @@ class LockScreen(QWidget):
     def show_locked(self):
         self._status_label.setText(f"PC-{PC_ID} — Tersedia")
         self._pin_entry.clear()
-        # kiosk_lock.install()  # TEMPORARY DISABLED FOR DEBUG
+        kiosk_lock.install()
         self._focus_guard.start(500)
         self.show()
         self._assert_topmost()
@@ -119,13 +119,9 @@ class LockScreen(QWidget):
     def eventFilter(self, obj, event):
         """Intercept keyboard events from PinEntry to catch IT escape key"""
         if event.type() == QEvent.Type.KeyPress:
-            # Debug: print all keys
-            print(f"EventFilter Key: {event.key()}, Mods: {event.modifiers()}")
-
             # Check for Ctrl+Shift+Q
             ctrl_shift = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
             if event.key() == Qt.Key.Key_Q and (event.modifiers() & ctrl_shift) == ctrl_shift:
-                print("IT escape from EventFilter!")
                 self.it_exit_requested.emit()
                 return True  # Block event from reaching PinEntry
 
@@ -133,13 +129,9 @@ class LockScreen(QWidget):
         return super().eventFilter(obj, event)
 
     def keyPressEvent(self, event):
-        # Debug: print all keys
-        print(f"LockScreen Key: {event.key()}, Mods: {event.modifiers()}")
-
         # Check for Ctrl+Shift+Q
         ctrl_shift = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
         if event.key() == Qt.Key.Key_Q and (event.modifiers() & ctrl_shift) == ctrl_shift:
-            print("IT escape from LockScreen!")
             self.it_exit_requested.emit()
             return
 
