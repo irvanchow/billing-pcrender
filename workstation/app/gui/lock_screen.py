@@ -1,7 +1,7 @@
 import os
 import sys
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QEvent
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
 
@@ -77,6 +77,7 @@ class LockScreen(QWidget):
 
         self._pin_entry = PinEntry()
         self._pin_entry.pin_submitted.connect(self._on_pin_submitted)
+        self._pin_entry.installEventFilter(self)  # Intercept keys before PinEntry
         layout.addWidget(self._pin_entry, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def _assert_topmost(self):
@@ -114,6 +115,22 @@ class LockScreen(QWidget):
 
     def closeEvent(self, event):
         event.ignore()
+
+    def eventFilter(self, obj, event):
+        """Intercept keyboard events from PinEntry to catch IT escape key"""
+        if event.type() == QEvent.Type.KeyPress:
+            # Debug: print all keys
+            print(f"EventFilter Key: {event.key()}, Mods: {event.modifiers()}")
+
+            # Check for Ctrl+Shift+Escape
+            ctrl_shift = Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier
+            if event.key() == Qt.Key.Key_Escape and (event.modifiers() & ctrl_shift) == ctrl_shift:
+                print("IT escape from EventFilter!")
+                self.it_exit_requested.emit()
+                return True  # Block event from reaching PinEntry
+
+        # Pass event to target widget
+        return super().eventFilter(obj, event)
 
     def keyPressEvent(self, event):
         # Debug: print all keys
