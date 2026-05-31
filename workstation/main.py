@@ -100,6 +100,7 @@ class KioskController:
 
     def _on_it_exit(self):
         """Handle IT exit request"""
+        print("_on_it_exit called!")
         from workstation.app.core import kiosk_lock
         kiosk_lock.remove()
         self._polling.stop()
