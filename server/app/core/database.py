@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS sessions (
     workstation_id    INTEGER NOT NULL REFERENCES workstations(id),
     student_name      TEXT NOT NULL,
     nim               TEXT NOT NULL,
+    program_studi     TEXT NOT NULL DEFAULT '',
+    keterangan        TEXT NOT NULL DEFAULT '',
     pin               TEXT NOT NULL UNIQUE,
     duration_minutes  INTEGER NOT NULL,
     started_at        TEXT,
@@ -59,6 +61,14 @@ def init_db() -> None:
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     with sqlite3.connect(DB_PATH) as conn:
         conn.executescript(_SCHEMA)
+        for sql in [
+            "ALTER TABLE sessions ADD COLUMN program_studi TEXT NOT NULL DEFAULT ''",
+            "ALTER TABLE sessions ADD COLUMN keterangan TEXT NOT NULL DEFAULT ''",
+        ]:
+            try:
+                conn.execute(sql)
+            except Exception:
+                pass
         conn.commit()
 
 

@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
     QLabel,
     QLineEdit,
     QMessageBox,
+    QPlainTextEdit,
     QPushButton,
     QSpinBox,
     QVBoxLayout,
@@ -43,6 +44,31 @@ class RegisterTab(QWidget):
         self._nim_edit = QLineEdit()
         self._nim_edit.setPlaceholderText("NIM mahasiswa")
 
+        self._prodi_combo = QComboBox()
+        for prodi in [
+            "Desain Komunikasi Visual",
+            "Desain Interior",
+            "Arsitektur",
+            "Desain Mode",
+            "Bisnis Digital",
+            "Manajemen Retail",
+            "Sistem & Teknologi Informasi",
+        ]:
+            self._prodi_combo.addItem(prodi)
+
+        keterangan_widget = QWidget()
+        keterangan_layout = QVBoxLayout(keterangan_widget)
+        keterangan_layout.setContentsMargins(0, 0, 0, 0)
+        keterangan_layout.setSpacing(2)
+        self._keterangan_edit = QPlainTextEdit()
+        self._keterangan_edit.setPlaceholderText("Tulis keterangan tambahan... (opsional)")
+        self._keterangan_edit.setFixedHeight(80)
+        self._keterangan_counter = QLabel("0/500")
+        self._keterangan_counter.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self._keterangan_edit.textChanged.connect(self._update_keterangan_counter)
+        keterangan_layout.addWidget(self._keterangan_edit)
+        keterangan_layout.addWidget(self._keterangan_counter)
+
         self._pc_combo = QComboBox()
         self._pc_combo.addItem("PC-1", 1)
         self._pc_combo.addItem("PC-2", 2)
@@ -54,6 +80,8 @@ class RegisterTab(QWidget):
 
         form.addRow("Nama Mahasiswa:", self._name_edit)
         form.addRow("NIM:", self._nim_edit)
+        form.addRow("Program Studi:", self._prodi_combo)
+        form.addRow("Keterangan:", keterangan_widget)
         form.addRow("Workstation:", self._pc_combo)
         form.addRow("Durasi:", self._duration_spin)
 
@@ -96,6 +124,14 @@ class RegisterTab(QWidget):
         layout.addWidget(self._pin_box)
         layout.addStretch()
 
+    def _update_keterangan_counter(self):
+        text = self._keterangan_edit.toPlainText()
+        if len(text) > 500:
+            cursor = self._keterangan_edit.textCursor()
+            self._keterangan_edit.setPlainText(text[:500])
+            self._keterangan_edit.setTextCursor(cursor)
+        self._keterangan_counter.setText(f"{min(len(text), 500)}/500")
+
     def _on_create(self):
         name = self._name_edit.text().strip()
         nim = self._nim_edit.text().strip()
@@ -105,6 +141,8 @@ class RegisterTab(QWidget):
 
         workstation_id = self._pc_combo.currentData()
         duration = self._duration_spin.value()
+        program_studi = self._prodi_combo.currentText()
+        keterangan = self._keterangan_edit.toPlainText().strip()
 
         with get_db() as conn:
             occupied = conn.execute(
@@ -120,7 +158,7 @@ class RegisterTab(QWidget):
                 return
 
             pin = generate_unique_pin(conn)
-            create_session(conn, workstation_id, name, nim, duration, pin)
+            create_session(conn, workstation_id, name, nim, program_studi, keterangan, duration, pin)
 
         self._pin_label.setText("  ".join(pin))
         pc_name = self._pc_combo.currentText()
@@ -129,6 +167,7 @@ class RegisterTab(QWidget):
 
         self._name_edit.clear()
         self._nim_edit.clear()
+        self._keterangan_edit.clear()
         self._duration_spin.setValue(60)
 
         self.session_created.emit()

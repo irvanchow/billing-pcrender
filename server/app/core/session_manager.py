@@ -20,16 +20,18 @@ def _log(conn: sqlite3.Connection, event_type: str, session_id: Optional[int] = 
 
 
 def create_session(conn: sqlite3.Connection, workstation_id: int, student_name: str,
-                   nim: str, duration_minutes: int, pin: str) -> int:
+                   nim: str, program_studi: str, keterangan: str,
+                   duration_minutes: int, pin: str) -> int:
     cursor = conn.execute(
-        "INSERT INTO sessions (workstation_id, student_name, nim, pin, duration_minutes, "
-        "status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (workstation_id, student_name, nim, pin, duration_minutes,
+        "INSERT INTO sessions (workstation_id, student_name, nim, program_studi, keterangan, "
+        "pin, duration_minutes, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (workstation_id, student_name, nim, program_studi, keterangan, pin, duration_minutes,
          SessionStatus.PENDING.value, _now_iso()),
     )
     session_id = cursor.lastrowid
     _log(conn, "SESSION_CREATED", session_id=session_id, workstation_id=workstation_id,
-         detail={"student_name": student_name, "nim": nim, "duration_minutes": duration_minutes})
+         detail={"student_name": student_name, "nim": nim, "program_studi": program_studi,
+                 "duration_minutes": duration_minutes})
     return session_id
 
 

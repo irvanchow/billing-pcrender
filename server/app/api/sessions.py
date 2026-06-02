@@ -31,6 +31,8 @@ def _row_to_response(row) -> SessionResponse:
         workstation_id=d["workstation_id"],
         student_name=d["student_name"],
         nim=d["nim"],
+        program_studi=d.get("program_studi", ""),
+        keterangan=d.get("keterangan", ""),
         pin=d["pin"],
         status=d["status"],
         duration_minutes=d["duration_minutes"],
@@ -58,12 +60,13 @@ def create(body: SessionCreate, conn: sqlite3.Connection = Depends(db_dep)):
 
     pin = generate_unique_pin(conn)
     session_id = create_session(conn, body.workstation_id, body.student_name, body.nim,
-                                body.duration_minutes, pin)
+                                body.program_studi, body.keterangan, body.duration_minutes, pin)
     return SessionCreatedResponse(
         session_id=session_id,
         pin=pin,
         workstation_id=body.workstation_id,
         student_name=body.student_name,
+        program_studi=body.program_studi,
         duration_minutes=body.duration_minutes,
     )
 
