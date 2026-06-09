@@ -1,3 +1,3 @@
 @echo off
 cd /d "%~dp0"
-start "" pythonw -m server.main
+start "" python -m server.main
