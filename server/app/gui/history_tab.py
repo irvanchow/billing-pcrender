@@ -43,6 +43,8 @@ class HistoryTab(QWidget):
         self._pc_combo.addItem("Semua", None)
         self._pc_combo.addItem("PC-1", 1)
         self._pc_combo.addItem("PC-2", 2)
+        self._pc_combo.addItem("PC-3", 3)
+        self._pc_combo.addItem("PC-4", 4)
         filter_row.addWidget(self._pc_combo)
 
         search_btn = QPushButton("Cari")

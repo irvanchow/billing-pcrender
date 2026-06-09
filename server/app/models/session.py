@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 
 class SessionCreate(BaseModel):
-    workstation_id: int = Field(..., ge=1, le=2)
+    workstation_id: int = Field(..., ge=1, le=4)
     student_name: str = Field(..., min_length=1, max_length=100)
     nim: str = Field(..., min_length=1, max_length=20)
     program_studi: str = Field(..., min_length=1, max_length=50)

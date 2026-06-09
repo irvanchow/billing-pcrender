@@ -54,6 +54,8 @@ CREATE INDEX IF NOT EXISTS idx_sessions_workstation ON sessions(workstation_id, 
 
 INSERT OR IGNORE INTO workstations (id, name) VALUES (1, 'PC-1');
 INSERT OR IGNORE INTO workstations (id, name) VALUES (2, 'PC-2');
+INSERT OR IGNORE INTO workstations (id, name) VALUES (3, 'PC-3');
+INSERT OR IGNORE INTO workstations (id, name) VALUES (4, 'PC-4');
 """
 
 

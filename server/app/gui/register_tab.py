@@ -72,6 +72,8 @@ class RegisterTab(QWidget):
         self._pc_combo = QComboBox()
         self._pc_combo.addItem("PC-1", 1)
         self._pc_combo.addItem("PC-2", 2)
+        self._pc_combo.addItem("PC-3", 3)
+        self._pc_combo.addItem("PC-4", 4)
 
         self._duration_spin = QSpinBox()
         self._duration_spin.setRange(5, 480)
